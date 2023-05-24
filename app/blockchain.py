@@ -10,14 +10,9 @@ class Blockchain:
         self.chain = []
         self.pending_transactions = []
         self.current_node_url = current_node_url
-        self.merkle_tree_proecss = []
         self.network_nodes = []
+        self.create_genesis_block()
         
-        
-        self.add_genesis_transaction({'amount' : 50,'sender': '0','recipient':self.node_address(),'transaction_id' : str(uuid4()).replace('-','')})
-        self.genesis_merkleroot = self.create_merkle_tree([self.hash_function(str(tx)) for tx in self.pending_transactions])
-        self.genesis_nonce = self.proof_of_work(self.hash_function('0'), {'merkle_root':self.genesis_merkleroot,'index' : 1})
-        self.create_new_block(self.genesis_nonce, self.hash_function('0'), self.hash_block(self.hash_function('0'), {'merkle_root':self.genesis_merkleroot,'index' : 1},self.genesis_nonce), self.genesis_merkleroot)
         
 
     def create_new_block(self, nonce, previous_block_hash, hash_, merkle_root):
@@ -72,14 +67,17 @@ class Blockchain:
 
     def chain_is_valid(self, chain):
         genesis_block = chain[0]
-        correct_nonce = genesis_block['nonce'] == 100
-        correct_previous_block_hash = genesis_block['previous_blockHash'] == '0'
-        correct_hash = genesis_block['hash'] == '0'
-        correct_transactions = len(genesis_block['transactions']) == 0
+        correct_nonce = genesis_block['nonce'] == self.proof_of_work(self.hash_function('0'), {'merkle_root':genesis_block['merkle_root'],'index' : 1})
+        correct_previous_block_hash = genesis_block['previous_block_hash'] == self.hash_function('0')
+        correct_hash = genesis_block['hash'] == self.hash_block(self.hash_function('0'), {'merkle_root':genesis_block['merkle_root'],'index' : 1},genesis_block['nonce'])
+        correct_transactions = len(genesis_block['transactions']) == 1
         validChain  = True
 
         if not (correct_nonce and correct_previous_block_hash and correct_hash and correct_transactions):
-            print("1")
+            print(correct_nonce)
+            print(correct_hash)
+            print(correct_previous_block_hash)
+            print(correct_transactions)
             validChain = False
 
         for i in range(1, len(chain)):
@@ -184,3 +182,11 @@ class Blockchain:
     def node_address(self):
         node_address = str(uuid4()).replace('-', '')
         return node_address
+    
+    def create_genesis_block(self):
+        self.merkle_tree_proecss = []
+        self.add_genesis_transaction({'amount' : 50,'sender': '0','recipient':self.node_address(),'transaction_id' : str(uuid4()).replace('-','')})
+        self.genesis_merkleroot = self.create_merkle_tree([self.hash_function(str(tx)) for tx in self.pending_transactions])
+        self.genesis_nonce = self.proof_of_work(self.hash_function('0'), {'merkle_root':self.genesis_merkleroot,'index' : 1})
+        self.create_new_block(self.genesis_nonce, self.hash_function('0'), self.hash_block(self.hash_function('0'), {'merkle_root':self.genesis_merkleroot,'index' : 1},self.genesis_nonce), self.genesis_merkleroot)
+    

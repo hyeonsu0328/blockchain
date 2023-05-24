@@ -13,7 +13,19 @@ node_address = bitcoin.node_address
 
 @app.route('/blockchain', methods=['GET']) #전체 블록을 보여줌
 def get_blockchain():
-    return jsonify(bitcoin.__dict__)
+    blockchain_data = bitcoin.__dict__.copy() 
+
+    blockchain_data.pop('genesis_merkleroot', None)
+    blockchain_data.pop('genesis_nonce', None)
+    blockchain_data.pop('merkle_tree_process', None)
+
+    response = {
+        'chain': blockchain_data['chain'],
+        'pending_transactions': blockchain_data['pending_transactions'],
+        'current_node_url' : blockchain_data['current_node_url'],
+        'network_nodes' : blockchain_data['network_nodes']
+    }
+    return jsonify(response), 200
 
 
 @app.route('/transaction', methods=['POST']) # pending_transactions에 transaction 추가
