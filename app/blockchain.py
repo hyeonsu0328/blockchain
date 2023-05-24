@@ -26,7 +26,7 @@ class Blockchain:
             'hash': hash_,
             'previous_block_hash': previous_block_hash
         }
-        self.pending_transactions = self.create_new_transaction(6.25,'00',self.node_address())
+        self.pending_transactions = self.create_new_transaction(6.25,'00','00')
         self.chain.append(new_block)
         return new_block
     
@@ -185,7 +185,7 @@ class Blockchain:
     
     def create_genesis_block(self):
         self.merkle_tree_proecss = []
-        self.add_genesis_transaction({'amount' : 50,'sender': '0','recipient':self.node_address(),'transaction_id' : str(uuid4()).replace('-','')})
+        self.add_genesis_transaction({'amount' : 50,'sender': '0','recipient':'0','transaction_id' : str(uuid4()).replace('-','')})
         self.genesis_merkleroot = self.create_merkle_tree([self.hash_function(str(tx)) for tx in self.pending_transactions])
         self.genesis_nonce = self.proof_of_work(self.hash_function('0'), {'merkle_root':self.genesis_merkleroot,'index' : 1})
         self.create_new_block(self.genesis_nonce, self.hash_function('0'), self.hash_block(self.hash_function('0'), {'merkle_root':self.genesis_merkleroot,'index' : 1},self.genesis_nonce), self.genesis_merkleroot)

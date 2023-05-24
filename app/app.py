@@ -8,8 +8,7 @@ import sys
 app = Flask(__name__)
 bitcoin = Blockchain()
 
-node_address = bitcoin.node_address
-
+node_address = str(uuid4()).replace('-', '')
 
 @app.route('/blockchain', methods=['GET']) #전체 블록을 보여줌
 def get_blockchain():
