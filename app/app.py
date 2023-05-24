@@ -4,7 +4,7 @@ from blockchain import Blockchain
 from uuid import uuid4
 import requests
 import sys
-import argparse
+
 app = Flask(__name__)
 bitcoin = Blockchain()
 
@@ -210,18 +210,15 @@ def generate_merkle_tree():
 
     return jsonify({'merkle_root': merkle_root}), 200
 
-def get_ip(type):
-    if type == 'public':
-        return requests.get('http://ipv4.icanhazip.com').text.strip()
-    else:
-        return 'localhost'
-
-
-parser = argparse.ArgumentParser()
-parser.add_argument('--type', default='localhost', choices=['localhost', 'public'],help="Specify 'localhost' to use localhost or 'public' to use public IP.")
-parser.add_argument('--port', type=int, default=5000, help="Specify port number to use.")
-args = parser.parse_args()
-ip = get_ip(args.type)
 
 if __name__ == "__main__":
-    app.run(host=ip, port=args.port)
+    if len(sys.argv) > 1:
+        port = int(sys.argv[1])
+    else:
+        port = 5000  # 기본 포트 번호를 설정하십시오.
+    
+    current_node_url = requests.get('http://ipv4.icanhazip.com').text.strip()
+    current_node_url = f"http://{current_node_url}:{port}"
+    
+    bitcoin = Blockchain(current_node_url)  # 현재 노드 URL 전달
+    app.run(host="0.0.0.0", port=port)
