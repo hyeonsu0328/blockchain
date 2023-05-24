@@ -140,7 +140,8 @@ def receive_new_block():
     last_block = bitcoin.get_last_block()
     correct_hash = last_block['hash'] == new_block['previous_block_hash']
     correct_index = last_block['index'] + 1 == new_block['index']
-
+    print(correct_hash)
+    print(correct_index)
     if correct_hash and correct_index:
         bitcoin.chain.append(new_block)
         bitcoin.pending_transactions = []
@@ -172,7 +173,7 @@ def consensus():
             new_longest_chain = blockchain['chain']
             new_pending_transactions = blockchain['pending_transactions']
 
-    if not new_longest_chain or (new_longest_chain and not bitcoin.chain_is_valid(new_longest_chain)):
+    if new_longest_chain == None or (new_longest_chain and not bitcoin.chain_is_valid(new_longest_chain)):
         return jsonify({
             'note': 'Current chain has not been replaced.',
             'chain': bitcoin.chain

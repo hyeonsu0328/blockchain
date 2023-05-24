@@ -84,7 +84,7 @@ class Blockchain:
             current_block = chain[i]
             prev_block = chain[i - 1]
 
-            block_hash = self.hash_block(prev_block['hash'],{"transactions": current_block['transactions'], "index": current_block['index']}, current_block['nonce'])
+            block_hash = self.hash_block(prev_block['hash'],{"merkle_root": current_block['merkle_root'], "index": current_block['index']}, current_block['nonce'])
             print(block_hash)
             if block_hash[:4] != '0000':
                 validChain = False
