@@ -12,10 +12,12 @@ class Blockchain:
         self.current_node_url = current_node_url
         self.merkle_tree_proecss = []
         self.network_nodes = []
-        self.genesis_nonce = self.proof_of_work(self.hash_function('0'), {'merkle_root':self.create_merkle_tree([self.hash_function(str(tx)) for tx in self.pending_transactions]),'index' : 1})
+        
+        
         self.add_genesis_transaction({'amount' : 50,'sender': '0','recipient':self.node_address(),'transaction_id' : str(uuid4()).replace('-','')})
-
-        self.create_new_block(self.genesis_nonce, self.hash_function('0'), self.hash_block(self.hash_function('0'), {'merkle_root':self.create_merkle_tree([self.hash_function(str(tx)) for tx in self.pending_transactions]),'index' : 1},self.genesis_nonce),self.create_merkle_tree([self.hash_function(str(tx)) for tx in self.pending_transactions]))
+        self.genesis_merkleroot = self.create_merkle_tree([self.hash_function(str(tx)) for tx in self.pending_transactions])
+        self.genesis_nonce = self.proof_of_work(self.hash_function('0'), {'merkle_root':self.genesis_merkleroot,'index' : 1})
+        self.create_new_block(self.genesis_nonce, self.hash_function('0'), self.hash_block(self.hash_function('0'), {'merkle_root':self.genesis_merkleroot,'index' : 1},self.genesis_nonce), self.genesis_merkleroot)
         
 
     def create_new_block(self, nonce, previous_block_hash, hash_, merkle_root):
@@ -148,7 +150,9 @@ class Blockchain:
     
     def create_merkle_tree(self, transactions):
         if len(transactions) == 0:
+            print("1")
             return None
+
 
         elif len(transactions) == 1: # 제네시스 및 처음부터 한개일때
             transactions.append(transactions[-1])
