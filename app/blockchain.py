@@ -2,8 +2,7 @@ import time
 import hashlib
 import json
 from uuid import uuid4
-from urllib.request import urlopen
-import requests
+
 
 class Blockchain:
     def __init__(self, current_node_url=None):
@@ -18,7 +17,6 @@ class Blockchain:
     def create_new_block(self, nonce, previous_block_hash, hash_, merkle_root):
         new_block = {
             'index': len(self.chain) + 1,
-            'timestamp': int(time.time() * 1000),
             'transactions': self.pending_transactions,
             'merkel_tree_process' : self.merkle_tree_proecss,
             'merkle_root': merkle_root,
@@ -74,10 +72,6 @@ class Blockchain:
         validChain  = True
 
         if not (correct_nonce and correct_previous_block_hash and correct_hash and correct_transactions):
-            print(correct_nonce)
-            print(correct_hash)
-            print(correct_previous_block_hash)
-            print(correct_transactions)
             validChain = False
 
         for i in range(1, len(chain)):
@@ -140,13 +134,15 @@ class Blockchain:
     def hash_function(self, data):
         return hashlib.sha256(data.encode('utf-8')).hexdigest()
     
-    def create_merkle_tree_node(self, left, right):
-        self.merkle_tree_proecss.append(self.hash_function(left))
-        self.merkle_tree_proecss.append(self.hash_function(right))
-        self.merkle_tree_proecss.append(self.hash_function(left + right))
+    def create_merkle_tree_node(self, left, right, index):
+        self.merkle_tree_proecss.append(str(index) + ".left :" + left)
+        self.merkle_tree_proecss.append(str(index) + ".right :" + right)
+        self.merkle_tree_proecss.append(str(index) + ".result :" + self.hash_function(left + right))
         return self.hash_function(left + right)
     
     def create_merkle_tree(self, transactions):
+        self.merkle_tree_proecss = []
+
         if len(transactions) == 0:
             print("1")
             return None
@@ -155,10 +151,12 @@ class Blockchain:
         elif len(transactions) == 1: # 제네시스 및 처음부터 한개일때
             transactions.append(transactions[-1])
             new_level = []
+            index = 1
             for i in range(0, len(transactions), 2):
                 left = transactions[i]
                 right = transactions[i + 1]
-                new_level.append(self.create_merkle_tree_node(left, right))
+                new_level.append(self.create_merkle_tree_node(left, right, index))
+                index += 1
             
             transactions = new_level
 
@@ -166,6 +164,8 @@ class Blockchain:
         
         else: #두개
             while len(transactions) > 1:
+                index = 1
+
                 if len(transactions) % 2 != 0:
                     transactions.append(transactions[-1])
 
@@ -173,7 +173,8 @@ class Blockchain:
                 for i in range(0, len(transactions), 2):
                     left = transactions[i]
                     right = transactions[i + 1]
-                    new_level.append(self.create_merkle_tree_node(left, right))
+                    new_level.append(self.create_merkle_tree_node(left, right, index))
+                    index += 1
 
                 transactions = new_level
 
