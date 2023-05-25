@@ -52,7 +52,7 @@ class Blockchain:
         while hash_[:4] != '0000':
             nonce += 1
             hash_ = self.hash_block(previous_block_hash, current_block_data, nonce)
-            print(hash_)
+            #print(hash_)
         return nonce
     
     def add_transaction_to_pending_transactions(self,transaction_obj):

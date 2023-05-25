@@ -229,8 +229,8 @@ if __name__ == "__main__":
     else:
         port = 5000  # 기본 포트 번호를 설정하십시오.
     
-    current_node_url = requests.get('http://ipv4.icanhazip.com').text.strip()
-    current_node_url = f"http://{current_node_url}:{port}"
-    #current_node_url = f"http://localhost:{port}"
+    #current_node_url = requests.get('http://ipv4.icanhazip.com').text.strip()
+    #current_node_url = f"http://{current_node_url}:{port}"
+    current_node_url = f"http://localhost:{port}"
     bitcoin = Blockchain(current_node_url)  # 현재 노드 URL 전달
     app.run(host="0.0.0.0", port=port)
